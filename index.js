@@ -11,6 +11,8 @@ const fs = require('fs');
 const mongoose = require('mongoose');
 const PORT = 8000;
 
+global.siteURL = `http://localhost:${PORT}/`;
+
 const dbURI = 'mongodb://127.0.0.1:27017/image_to_text'; 
 
 connectMongoDb(dbURI).then(() => console.log('MongoDB connected successfully!')).catch(err => console.error('MongoDB connection error:', err));

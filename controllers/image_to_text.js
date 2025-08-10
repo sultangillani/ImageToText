@@ -36,7 +36,34 @@ async function deleteImageByName(req,res) {
             console.log(`No entry found for ImageName: ${imageName}`);
         }
 		
-		return res.json({id: `Deleted entry with ImageName: ${imageName}`, collectedImagePath: collectedImagePath});
+		res.redirect(global.siteURL);
+    } catch (err) {
+        console.error("Error deleting entry:", err);
+    }
+}
+
+async function deleteImageByNameForm(req,res) {
+	
+	const body = req.body;
+	if(!body.image_name){
+		return res.status(404).json({error: 'URL is required.'});
+	}
+
+	imageName = body.image_name;
+    try {
+		const collectedImage = await imageCollection.findOne({ImageName: imageName});
+		const collectedImagePath = await collectedImage.ImagePath;
+
+        const deleted = await imageCollection.findOneAndDelete({ ImageName: imageName });
+
+		deleteProcessImage(collectedImagePath);
+        if (deleted) {
+            console.log(`Deleted entry with ImageName: ${imageName}`);
+        } else {
+            console.log(`No entry found for ImageName: ${imageName}`);
+        }
+		
+		res.redirect(global.siteURL);
     } catch (err) {
         console.error("Error deleting entry:", err);
     }
@@ -47,7 +74,7 @@ async function handleRenderHomePage(req,res){
 	const imagePath = path.resolve(__dirname, '../uploads', '1754768821149.png');
 	
 	//const result = await imageCollection.deleteMany({});
-
+	console.log(global.siteURL);
 	const allimageCollection = await imageCollection.find({});
 
     return res.render('home',{
@@ -58,20 +85,7 @@ async function handleRenderHomePage(req,res){
 
 async function handleRenderimageToText(req,res){
 	const body = req.body;
-	/*const shortId = shortid();
-	if(!body.url){
-		return res.status(404).json({error: 'URL is required.'});
-	}
-	await URL.create({
-		shortId: shortId,
-		redirectURL: body.url,
-		visitedHistory: []
-	});*/
 	
-	/*console.log(body);
-	return res.render('home',{
-		id: 0,
-	});*/
 	const filename = '../uploads/' + req.file.filename;
 	const imagePath = path.join(__dirname, filename);
 	let EText = '';
@@ -100,11 +114,12 @@ async function handleRenderimageToText(req,res){
 	//return res.json({result: EText});
 
 	const allimageCollection = await imageCollection.find({});
-	return res.render('home',{
+	res.redirect(global.siteURL);
+	/*return res.render('home',{
 		image: fileUrl,
 		text: EText,
 		allimages: allimageCollection
-	});
+	});*/
 
 	//console.log("Uploaded file info:", req.file);
   	//res.send(`File uploaded: ${imagePath} <br /> Extracted Text: result: ${EText}`);
@@ -115,5 +130,6 @@ async function handleRenderimageToText(req,res){
 module.exports = {
 	handleRenderimageToText,
     handleRenderHomePage,
-	deleteImageByName
+	deleteImageByName,
+	deleteImageByNameForm
 };
