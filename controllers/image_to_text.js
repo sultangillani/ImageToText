@@ -66,6 +66,7 @@ async function deleteImageByNameForm(req,res) {
 		res.redirect(global.siteURL);
     } catch (err) {
         console.error("Error deleting entry:", err);
+		res.redirect(global.siteURL);
     }
 }
 
